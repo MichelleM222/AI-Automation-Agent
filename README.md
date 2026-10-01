@@ -1,5 +1,8 @@
 # AI Automation Agent
 ### Intelligent Message Classification and Automated Response System
+## Project Preview
+
+![AI Automation Agent](IMG1.png)
 
 An AI-powered workflow automation prototype developed using n8n and OpenAI to classify incoming messages and support automated customer communication.
 
