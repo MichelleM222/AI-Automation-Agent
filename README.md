@@ -42,6 +42,12 @@ Based on the classification, the workflow can support the corresponding response
 
 Incoming Message → AI Classification → Conditional Routing → Response Generation
 
+## Workflow Implementation
+
+The complete n8n workflow is available here:
+
+[View and download the n8n workflow](./ai-automation-agent-workflow.json)
+
 ## Key Features
 
 - Automated message classification.
