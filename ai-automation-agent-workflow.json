@@ -1,0 +1,196 @@
+{
+  "name": "TRABAJO#1",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "9c9e1961-c27d-4d39-8239-420ebf096428",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        128
+      ],
+      "id": "8426e467-12b0-4bb0-b4c0-90e16322afd6",
+      "name": "Webhook",
+      "webhookId": "9c9e1961-c27d-4d39-8239-420ebf096428"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        256,
+        128
+      ],
+      "id": "62ac7de8-7880-463f-aafa-21fc7ba83a20",
+      "name": "When chat message received",
+      "webhookId": "e28f0e4a-3914-49d1-aa3e-e5327502f8ba"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nClasifica el siguiente mensaje en UNA sola categoría.\n\nCategorías:\n\n- Soporte: problemas técnicos, fallas, no funciona, no enciende, errores, reparación, ayuda técnica, soporte, urgente.\n- Ventas: precio, oferta, compra, cotización, pedido, disponibilidad.\n- Queja: horrible, pésimo, reclamo, insatisfacción, falló varias veces, molesto, servicio malo.\n- Información: solicitudes de datos generales, catálogo, características, modelos, especificaciones.\n\nResponde SOLO con una palabra exacta:\nSoporte, Ventas, Queja o Información.\n\nMensaje:\n{{$json.chatInput}}\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=Eres un clasificador preciso de mensajes.\nDebes elegir una sola categoría según las definiciones dadas.\nResponde SOLO con una palabra exacta."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        400,
+        128
+      ],
+      "id": "b70505fd-e99c-4e0d-ad11-e6bd00ef7480",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-4o-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        400,
+        384
+      ],
+      "id": "80e98ea7-8abc-4eb0-bd32-2625c0335fbb",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "j35bsWosby8fX2ep",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6086ad96-e7e0-4c49-a499-242e48002408",
+              "leftValue": "={{$json.text}}",
+              "rightValue": "Soporte",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        736,
+        128
+      ],
+      "id": "4ec1bfc7-982f-4552-91fb-9ab656ba872d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "{{$node[\"Nombre del nodo OpenAI\"][\"json\"][\"message\"][\"content\"][0][\"text\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        976,
+        112
+      ],
+      "id": "fb515811-d8b0-46e9-af12-6031b1d62ff8",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d511d914-98e6-4f31-9fef-be52319a908a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3381f5a59004bb54da6893725f3fd58c8a0b8b8a33452044e4a25539cdbe4d4c"
+  },
+  "id": "DUPR5Tr29WN2Y9sS",
+  "tags": []
+}
